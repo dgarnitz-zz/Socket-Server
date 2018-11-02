@@ -33,27 +33,19 @@ public class ConnectionHandler {
         String[] requestLine = line.split(" ");
 
         if(requestLine[0].startsWith("GET")) {
-            System.out.println("ConnectionHandler: This contains a GET method: " + line);
-            HeadRequest.simpleWriter(os,"HTTP/1.1 200 OK");
+            HeadRequest.simpleWriter(os,requestLine);
         } else if(requestLine[0].startsWith("HEAD")) {
-            System.out.println("ConnectionHandler: This contains a HEAD method: " + line);
-            HeadRequest.simpleWriter(os,"HTTP/1.1 200 OK");
+            HeadRequest.simpleWriter(os,requestLine);
         }
     }
 
     private void printClientData() throws DisconnectedException, IOException {
         while(true) {
-            String line = br.readLine(); // get data from client over socket
-            // if readLine fails we can deduce here that the connection to the client is broken
-            // and shut down the connection on this side cleanly by throwing a DisconnectedException
-            // which will be passed up the call stack to the nearest handler (catch block)
-            // in the run method
+            String line = br.readLine();
             if(line == null || line.equals("null") || line.equals("exit") ){
                 throw new DisconnectedException(" ... client has closed the connection ... ");
             }
-            // in this simple setup all the server does in response to messages from the client is to send
-            // a single ACK byte back to client - the client uses this ACK byte to test whether the
-            // connection to this server is still live, if not the client shuts down cleanly
+
             os.write(WebServerMain.ackByte);
             checkRequest(line);
         }

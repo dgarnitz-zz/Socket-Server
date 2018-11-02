@@ -12,8 +12,8 @@ public class Server {
             while(true){
                 Socket conn = ss.accept(); // will wait until client requests a connection, then returns connection (socket)
                 System.out.println("Server got new connection request from " + conn.getInetAddress());
-                ConnectionHandler ch = new ConnectionHandler(conn); // create new handler for this connection
-                ch.handleClientRequest();                                         // start handler thread
+                ConnectionHandler ch = new ConnectionHandler(conn);
+                ch.handleClientRequest();
             }
         } catch (IOException ioe){
             System.out.println("Ooops " + ioe.getMessage());

@@ -1,9 +1,11 @@
 import java.io.IOException;
 import java.net.*;
 import java.io.*;
+import java.nio.file.*;
 
 public class WebServerMain {
     public static final byte ackByte = 1;
+    public static String directory;
 
     public static void main(String[] args) {
         if(args.length != 2){
@@ -12,11 +14,15 @@ public class WebServerMain {
             return;
         }
 
-        String directory = args[0];
-        if (!directory.matches(".*[/\\\\].*")){
+        directory = args[0];
+
+        File directoryPath = new File(directory);
+        if(!directoryPath.isDirectory()){
             System.out.println("Please pass a valid directory path as an argument");
             return;
         }
+
+        directory = directory + "beer.jpg";
 
         //DECOMPOSE this into a method
         //Right now it looks for a file, but you first need to check if its a directory
@@ -25,7 +31,7 @@ public class WebServerMain {
         // JON: "The way this should work is to take the directory location as an argument
         //       then append the file name to that directory. then it will read in that particular file
         //       The request will not request a specific directory, it will request a specific file
-        //       It may also search for a subdirectory so you need to wire it up to look for that
+        //       It may also search for a subdirectory so you need to wire it up to look for that"
         try (BufferedReader br = new BufferedReader(new FileReader(directory))) {
             System.out.println("Successfully loaded directory");
         }  catch (FileNotFoundException e) {
