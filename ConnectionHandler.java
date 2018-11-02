@@ -22,29 +22,22 @@ public class ConnectionHandler {
         System.out.println("new ConnectionHandler thread started .... "); //I don't think this actually starts a new thread
         try {
             printClientData();
-        } catch  (Exception e){
+        } catch (Exception e) {
             System.out.println("ConnectionHandler:run " + e.getMessage());
             cleanup();
         }
     }
 
-    private void checkRequest(String line){
+    private void checkRequest(String line) {
         System.out.println("ConnectionHandler: " + line);
-        if(line.startsWith("GET")){
-            System.out.println("ConnectionHandler: This contains a GET method: " + line);
-            simpleWriter("GET request received");
-        } else if(line.startsWith("HEAD")){
-            System.out.println("ConnectionHandler: This contains a HEAD method: " + line);
-            simpleWriter("GET request received");
-        }
-    }
+        String[] requestLine = line.split(" ");
 
-    public void simpleWriter(String line){
-        byte[] response = line.getBytes();
-        try {
-            os.write(response);
-        } catch (IOException ioe){
-            System.out.println("ConnectionHandler: failed response " + ioe.getMessage());
+        if(requestLine[0].startsWith("GET")) {
+            System.out.println("ConnectionHandler: This contains a GET method: " + line);
+            HeadRequest.simpleWriter(os,"HTTP/1.1 200 OK");
+        } else if(requestLine[0].startsWith("HEAD")) {
+            System.out.println("ConnectionHandler: This contains a HEAD method: " + line);
+            HeadRequest.simpleWriter(os,"HTTP/1.1 200 OK");
         }
     }
 
