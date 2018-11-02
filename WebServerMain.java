@@ -6,6 +6,7 @@ import java.nio.file.*;
 public class WebServerMain {
     public static final byte ackByte = 1;
     public static String directory;
+    public static String fileName;
 
     public static void main(String[] args) {
         if(args.length != 2){
@@ -22,7 +23,16 @@ public class WebServerMain {
             return;
         }
 
-        directory = directory + "beer.jpg";
+        // DECOMPOSE this into a method
+        int port = Integer.parseInt(args[1]);
+        if(port > 65535 || port < 0){
+            System.out.println("Invalid port number. Please enter a number between 0 and 65535");
+            return;
+        }
+
+        Server s = new Server(port);
+
+        directory = directory + fileName;
 
         //DECOMPOSE this into a method
         //Right now it looks for a file, but you first need to check if its a directory
@@ -41,14 +51,6 @@ public class WebServerMain {
             System.out.println("Error with I/O" + e.getMessage());
             return;
         }
-
-        // DECOMPOSE this into a method
-        int port = Integer.parseInt(args[1]);
-        if(port > 65535 || port < 0){
-            System.out.println("Invalid port number. Please enter a number between 0 and 65535");
-            return;
-        }
-        Server s = new Server(port);
 
         return;
     }
