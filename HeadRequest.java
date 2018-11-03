@@ -6,6 +6,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ArrayList;
 import java.net.Socket;
 
 
@@ -29,12 +30,36 @@ public class HeadRequest {
         } else {
             return " 404 Not found";
         }
+    }
 
-        /*BasicFileAttributes attribute = Files.readAttributes(path, BasicFileAttributes.class);
-        System.out.println(attribute.size());
+    public static String contentLength(Path path) {
+        try{
+            long size = Files.size(path);
+            return "Content-Length: " + size;
+        } catch (IOException ioe) {
+            System.out.println("Error reading content length: " + ioe.getMessage());
+            return "Content length: Unknown";
+        }
+
+        /*
+        BasicFileAttributes attribute = Files.readAttributes(path, BasicFileAttributes.class);
+        String size = (String)attribute.size();
         https://docs.oracle.com/javase/7/docs/api/java/nio/file/Files.html
         https://docs.oracle.com/javase/8/docs/api/java/nio/file/attribute/BasicFileAttributes.html
         */
+    }
+
+    public static void convertToBytesAndSend(ArrayList<String> responses, PrintWriter pw){
+        for(String r : responses){
+            pw.println(r);
+            pw.flush();
+            System.out.println(r);
+
+            /*
+            //Use for binary data
+            byte[] response = r.getBytes();
+            pw.println(response); */
+        }
     }
 
 
@@ -46,47 +71,50 @@ public class HeadRequest {
             PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
 
             String protocol = checkProtocol(line[2]);
-            if(protocol.equals("Error")){
-                return;
-            }
 
             Path path = Paths.get(".", WebServerMain.directory, line[1]);
-            String responseCode = responseCode(path);
+
             WebServerMain.fileName = line[1];
-            String ServerResponse = protocol + responseCode;
-            System.out.println(ServerResponse);
 
-            byte[] response = ServerResponse.getBytes();
-            pw.println(response);
+            String responseCode = responseCode(path);
+            String ServerResponse;
+            if(protocol.equals("Error")){
+                ServerResponse = "HTTP/1.1 400 Bad Request";
+            } else {
+                ServerResponse = protocol + responseCode;
+            }
 
-
+            ArrayList<String> responses = new ArrayList<String>();
+            responses.add(ServerResponse);
 
             //Date
             Date d = new Date();
             String formatted = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss").format(d);
             String date = "Date: " + formatted;
-            System.out.println(date);
-            byte[] dateStamp = date.getBytes();
-            pw.println(dateStamp);
+            responses.add(date);
 
-            String contentType = "text/html";
-            byte[] type = contentType.getBytes();
-            pw.println(type);
+            //NEED conditional handling for this, because it wont be sent if theres a server error <- I THINK, not sure
+            String contentType = "Content-Type: text/html; charset=UTF-8";
+            responses.add(contentType);
 
             //Server Name
-            String serverName = "David's Server";
-            byte[] serverN = serverName.getBytes();
-            pw.println(serverN);
+            String serverName = "Server: David Garnitz Server";
+            responses.add(serverName);
 
             //NEED a method to get the content length --> use built in methods
-            String length = "9000\r\n";
-            byte[] contentLength = length.getBytes();
-            pw.println(contentLength);
+            String length = contentLength(path)  + "\r\n";
+            responses.add(length);
 
-            //End header section
+            /*
+            //End header section <-- NOT SURE if this is needed for a header or only other responses
             String endHeader = "\r\n";
-            byte[] end = endHeader.getBytes();
-            pw.println(end);
+            responses.add(endHeader);
+            */
+
+            String htmlTest = "<head>David Garnitz Website</head>\n<body>\n<h1>HELLO</h1>\n</body>";
+            responses.add(htmlTest);
+
+            convertToBytesAndSend(responses, pw);
 
         } catch (Exception e) {
             System.out.println("ConnectionHandler: failed response " + e.getMessage());
