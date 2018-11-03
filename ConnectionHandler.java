@@ -2,17 +2,17 @@ import java.io.*;
 import java.net.Socket;
 
 public class ConnectionHandler {
-    private Socket conn;       // socket representing TCP/IP connection to Client
-    private InputStream is;    // get data from client on this input stream
-    private OutputStream os;   // can send data back to the client on this output stream
-    BufferedReader br;         // use buffered reader to read client data
+    private Socket conn;
+    private InputStream is;
+    private OutputStream os;
+    BufferedReader br;
 
     public ConnectionHandler(Socket conn) {
         this.conn = conn;
         try{
-            is = conn.getInputStream();     // get data from client on this input stream
-            os = conn.getOutputStream();  // to send data back to the client on this stream
-            br = new BufferedReader(new InputStreamReader(is)); // use buffered reader to read client data
+            is = conn.getInputStream();
+            os = conn.getOutputStream();
+            br = new BufferedReader(new InputStreamReader(is));
         } catch (IOException ioe){
             System.out.println("ConnectionHandler: " + ioe.getMessage());
         }
@@ -28,14 +28,16 @@ public class ConnectionHandler {
         }
     }
 
+    //NEED to rework this function to call the correct functions for certain request types and handle errors
     private void checkRequest(String line) {
         System.out.println("ConnectionHandler: " + line);
         String[] requestLine = line.split(" ");
 
         if(requestLine[0].startsWith("GET")) {
-            HeadRequest.simpleWriter(os,requestLine);
+            Request.simpleWriter(os,requestLine);
+            GetRequest.readInResource(os);
         } else if(requestLine[0].startsWith("HEAD")) {
-            HeadRequest.simpleWriter(os,requestLine);
+            Request.simpleWriter(os,requestLine);
         }
     }
 
@@ -44,9 +46,9 @@ public class ConnectionHandler {
             String line = br.readLine();
             if(line == null || line.equals("null") || line.equals("exit") ){
                 throw new DisconnectedException(" ... client has closed the connection ... ");
+                //SHOULD this function end here. or should it allow the SERVER to send an error message back to CLIENT
             }
 
-            os.write(WebServerMain.ackByte);
             checkRequest(line);
         }
     }

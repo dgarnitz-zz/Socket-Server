@@ -32,26 +32,5 @@ public class WebServerMain {
 
         Server s = new Server(port);
 
-        directory = directory + fileName;
-
-        //DECOMPOSE this into a method
-        //Right now it looks for a file, but you first need to check if its a directory
-        //Then you need to actually need to read in each individual file from that directory
-        //Plus any subdirectories listed
-        // JON: "The way this should work is to take the directory location as an argument
-        //       then append the file name to that directory. then it will read in that particular file
-        //       The request will not request a specific directory, it will request a specific file
-        //       It may also search for a subdirectory so you need to wire it up to look for that"
-        try (BufferedReader br = new BufferedReader(new FileReader(directory))) {
-            System.out.println("Successfully loaded directory");
-        }  catch (FileNotFoundException e) {
-            System.out.println("Directory not found : " + e.getMessage());
-            return;
-        } catch (IOException e) {
-            System.out.println("Error with I/O" + e.getMessage());
-            return;
-        }
-
-        return;
     }
 }
