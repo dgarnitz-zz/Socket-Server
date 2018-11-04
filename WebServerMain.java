@@ -10,8 +10,7 @@ public class WebServerMain {
 
     public static void main(String[] args) {
         if(args.length != 2){
-            System.out.println("java WebServerMain");
-            System.out.println("Usage java WebServerMain <document_root> <port>");
+            System.out.println("Usage: java WebServerMain <document_root> <port>");
             return;
         }
 
@@ -23,7 +22,6 @@ public class WebServerMain {
             return;
         }
 
-        // DECOMPOSE this into a method
         int port = Integer.parseInt(args[1]);
         if(port > 65535 || port < 0){
             System.out.println("Invalid port number. Please enter a number between 0 and 65535");

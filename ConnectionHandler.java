@@ -36,7 +36,7 @@ public class ConnectionHandler {
         if(requestLine[0].startsWith("GET")) {
             Request.simpleWriter(os,requestLine);
             GetRequest.readInResource(os);
-        } else if(requestLine[0].startsWith("HEAD")) {
+        } else {
             Request.simpleWriter(os,requestLine);
         }
     }

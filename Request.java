@@ -26,10 +26,14 @@ public class Request {
 
     public static String responseCode(Path path) {
         if(Files.exists(path)) {
-            return " 202 OK";
+            return " 200 OK";
         } else {
-            return " 404 Not found";
+            return " 404 Not Found";
         }
+    }
+
+    public static boolean isHeadOrGetRequest(String requestMethod) {
+       return (requestMethod.equals("HEAD") || requestMethod.equals("GET"));
     }
 
     public static String contentLength(Path path) {
@@ -66,8 +70,7 @@ public class Request {
 
     public static void simpleWriter(OutputStream os, String[] line) {
 
-        //The data written below also need to be written into a file. Will need to create a separate class or method
-        //for that
+
         try {
             PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
 
@@ -81,6 +84,8 @@ public class Request {
             String ServerResponse;
             if(protocol.equals("Error")){
                 ServerResponse = "HTTP/1.1 400 Bad Request";
+            } else if (!isHeadOrGetRequest(line[0])) {
+                ServerResponse = "HTTP/1.1 501 Not Implemented";
             } else {
                 ServerResponse = protocol + responseCode;
             }
@@ -98,13 +103,15 @@ public class Request {
             String serverName = "Server: David Garnitz Server";
             responses.add(serverName);
 
-            //NEED conditional handling for this, because it wont be sent if theres a server error <- I THINK, not sure
-            String contentType = "Content-Type: " + contentType(path);
-            responses.add(contentType);
+            if(isHeadOrGetRequest(line[0])){
+                //Content-Type
+                String contentType = "Content-Type: " + contentType(path);
+                responses.add(contentType);
 
-            //Content-Length
-            String length = contentLength(path)  + "\r\n";
-            responses.add(length);
+                //Content-Length
+                String length = contentLength(path)  + "\r\n";
+                responses.add(length);
+            }
 
             convertToBytesAndSend(responses, pw);
 
