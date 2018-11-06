@@ -38,6 +38,7 @@ public class Request {
 
     public static String contentLength(Path path) {
         try{
+            System.out.println("Checking: " + path);
             long size = Files.size(path);
             return "Content-Length: " + size;
         } catch (IOException ioe) {
@@ -76,7 +77,7 @@ public class Request {
 
             String protocol = checkProtocol(line[2]);
 
-            Path path = Paths.get(".", WebServerMain.directory, line[1]);
+            Path path = Paths.get("/", WebServerMain.directory, line[1]);
 
             WebServerMain.fileName = line[1];
 
@@ -92,23 +93,19 @@ public class Request {
 
             ArrayList<String> responses = new ArrayList<String>();
             responses.add(ServerResponse);
-
-            //Date
+            
             Date d = new Date();
             String formatted = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss").format(d);
             String date = "Date: " + formatted;
             responses.add(date);
 
-            //Server Name
             String serverName = "Server: David Garnitz Server";
             responses.add(serverName);
 
             if(isHeadOrGetRequest(line[0])){
-                //Content-Type
                 String contentType = "Content-Type: " + contentType(path);
                 responses.add(contentType);
 
-                //Content-Length
                 String length = contentLength(path)  + "\r\n";
                 responses.add(length);
             }
