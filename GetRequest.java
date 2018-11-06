@@ -1,14 +1,24 @@
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class GetRequest extends Request {
+/**
+ * The GetRequest class is responsible for reading in the data from the specified resource and sending it to the client.
+ * It accomplishes this through the use of convertToBytesAndSend method it inherits from Request.
+ */
+class GetRequest extends Request {
 
-    public static void readInResource(OutputStream os) {
+    /**
+     * readInResources is the only method of the GetRequest class. It uses a BufferedReader to read in the content
+     * line by line, adding each line to an ArrayList. After all the lines have been read in, it then creates
+     * a PrintWriter using the OutputStream "os" it is passed as an argument. It then passes that using PrintWriter
+     * and the ArrayList "content".
+     * @param os OutputStream associated with the ServerSocket's Socket object
+     */
+    static void readInResource(OutputStream os) {
         String directory = WebServerMain.directory + WebServerMain.fileName;
 
         try (BufferedReader br = new BufferedReader(new FileReader(directory))) {
-            ArrayList<String> content = new ArrayList<String>();
+            ArrayList<String> content = new ArrayList<>();
 
             while(true) {
                 String line = br.readLine();
@@ -25,10 +35,8 @@ public class GetRequest extends Request {
 
         }  catch (FileNotFoundException e) {
             System.out.println("Directory not found : " + e.getMessage());
-            return;
         } catch (IOException e) {
             System.out.println("Error with I/O" + e.getMessage());
-            return;
         }
     }
 

@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,21 +11,22 @@ import java.util.ArrayList;
 import java.net.Socket;
 
 
-public class Request {
+class Request {
 
 
-    public static String checkProtocol(String protocol){
-        if(protocol.equals("HTTP/1.1")){
-            return "HTTP/1.1";
-        } else if (protocol.equals("HTTP/1.0")){
-            return "HTTP/1.0";
-        } else {
-            System.out.println("This server does not support this protocol");
-            return "Error";
+    private static String checkProtocol(String protocol){
+        switch (protocol) {
+            case "HTTP/1.1":
+                return "HTTP/1.1";
+            case "HTTP/1.0":
+                return "HTTP/1.0";
+            default:
+                System.out.println("This server does not support this protocol");
+                return "Error";
         }
     }
 
-    public static String responseCode(Path path) {
+    private static String responseCode(Path path) {
         if(Files.exists(path)) {
             return " 200 OK";
         } else {
@@ -32,11 +34,16 @@ public class Request {
         }
     }
 
-    public static boolean isHeadOrGetRequest(String requestMethod) {
+    private static boolean isHeadOrGetRequest(String requestMethod) {
        return (requestMethod.equals("HEAD") || requestMethod.equals("GET"));
     }
 
-    public static String contentLength(Path path) {
+    private static String getDate() {
+        Date d = new Date();
+        String formatted = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss").format(d);
+        return formatted;
+    }
+    private static String contentLength(Path path) {
         try{
             System.out.println("Checking: " + path);
             long size = Files.size(path);
@@ -47,7 +54,7 @@ public class Request {
         }
     }
 
-    public static String contentType(Path path) {
+    private static String contentType(Path path) {
         try {
             return Files.probeContentType(path);
         } catch (IOException ioe) {
@@ -56,20 +63,45 @@ public class Request {
         }
     }
 
-    public static void convertToBytesAndSend(ArrayList<String> responses, PrintWriter pw){
+    static void convertToBytesAndSend(ArrayList<String> responses, PrintWriter pw){
         for(String r : responses){
             pw.println(r);
             pw.flush();
             System.out.println(r);
 
-            /*
+
+
             //Use for binary data
-            byte[] response = r.getBytes();
-            pw.println(response); */
+            /* byte[] response = r.getBytes();
+            pw.println(response);
+            pw.flush(); */
         }
     }
 
-    public static void simpleWriter(OutputStream os, String[] line) {
+    private static void logRequests(ArrayList<String> responses, String[] line) {
+        try {
+            String fileName = "Web Server Request Log File.txt";
+            String firstLine = "Client Request Listed Below:";
+            String secondLine = line[0] + " " + line[1] + " " + line[2];
+            String thirdLine = "Server Response Listed Below:";
+
+            PrintWriter logFile = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName, true))));
+            logFile.println(firstLine);
+            logFile.println(secondLine);
+            logFile.println(thirdLine);
+            logFile.flush();
+
+            for(String r : responses) {
+                logFile.println(r);
+                logFile.flush();
+            }
+
+        } catch (IOException ioe) {
+            System.out.print("Error logging requests in a file: " + ioe.getMessage());
+        }
+    }
+
+    static void simpleWriter(OutputStream os, String[] line) {
 
 
         try {
@@ -93,10 +125,9 @@ public class Request {
 
             ArrayList<String> responses = new ArrayList<String>();
             responses.add(ServerResponse);
-            
-            Date d = new Date();
-            String formatted = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss").format(d);
-            String date = "Date: " + formatted;
+
+
+            String date = "Date: " + getDate();
             responses.add(date);
 
             String serverName = "Server: David Garnitz Server";
@@ -111,7 +142,7 @@ public class Request {
             }
 
             convertToBytesAndSend(responses, pw);
-
+            logRequests(responses, line);
         } catch (Exception e) {
             System.out.println("ConnectionHandler: failed response " + e.getMessage());
         }
