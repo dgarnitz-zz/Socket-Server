@@ -26,7 +26,7 @@ public class Server {
                 System.out.println("Server got new connection request from " + conn.getInetAddress());
                 ConnectionHandler ch = new ConnectionHandler(conn);
                 ch.handleClientRequest();
-                //Do I need to break this while loop somehow??
+
             }
         } catch (IOException ioe){
             System.out.println("Ooops " + ioe.getMessage());
