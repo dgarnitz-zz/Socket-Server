@@ -14,7 +14,7 @@ public class Server {
      * The constructor method for the Server class, it takes an int as an argument, containing a port number, enters a
      * while-true loop that creates a Socket object using the ServerSocket's accept method, which will create a
      * Socket object once a successful connection with a client is made. It then creates a ConnectionHandler
-     * object using the Socket object, and calls the ConnectionHandler's handleClientRequest method.
+     * object using the Socket object, and calls the ConnectionHandler's run method.
      * @param port an int containing the port number that will be used to create a ServerSocket object
      */
     public Server(int port){
@@ -25,8 +25,7 @@ public class Server {
                 Socket conn = ss.accept();
                 System.out.println("Server got new connection request from " + conn.getInetAddress());
                 ConnectionHandler ch = new ConnectionHandler(conn);
-                ch.handleClientRequest();
-
+                ch.start();
             }
         } catch (IOException ioe){
             System.out.println("Ooops " + ioe.getMessage());

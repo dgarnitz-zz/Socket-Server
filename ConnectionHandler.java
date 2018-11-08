@@ -6,11 +6,11 @@ import java.net.Socket;
  * one each of Socket, InputStream, OutputStream, and BufferedReader objects, which it uses to read in requests
  * and send responses.
  * While this class has the same name as the as the example class posted on StudRes, slight alterations have been made
- * to the original handleClientRequest and printClientData. Important, the checkRequest method, which is responsible for
+ * to the original run and printClientData. Important, the checkRequest method, which is responsible for
  * beginning the actual processing of the request and sending of the response, has been added, enabling the
  * required functionality.
  */
-class ConnectionHandler {
+class ConnectionHandler extends Thread {
     private Socket conn;
     private InputStream is;
     private OutputStream os;
@@ -34,11 +34,12 @@ class ConnectionHandler {
     }
 
     /**
-     * handleClientRequest is a void method that runs a try-catch on the printClientData method, which attempts to read
+     * run is a void method that runs a try-catch on the printClientData method, which attempts to read
      * in the request sent by the client. This method will call the cleanup method if it cannot successfully read the
      * request, closing all connections.
      */
-    void handleClientRequest() {
+    @Override
+    public void run() {
         System.out.println("new ConnectionHandler thread started .... "); //I don't think this actually starts a new thread
         try {
             printClientData();
@@ -94,7 +95,7 @@ class ConnectionHandler {
      * safely and properly ended.
      * This method is identical to the one in the sample code.
      */
-    private void cleanup(){
+    public void cleanup(){
         System.out.println("ConnectionHandler: ... cleaning up and exiting ... " );
         try{
             br.close();
