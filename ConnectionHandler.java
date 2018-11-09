@@ -8,7 +8,7 @@ import java.net.Socket;
  * While this class has the same name as the as the example class posted on StudRes, slight alterations have been made
  * to the original run and printClientData. Important, the checkRequest method, which is responsible for
  * beginning the actual processing of the request and sending of the response, has been added, enabling the
- * required functionality.
+ * required functionality. It is also important to note that this class extends Thread.
  */
 class ConnectionHandler extends Thread {
     private Socket conn;
@@ -40,7 +40,7 @@ class ConnectionHandler extends Thread {
      */
     @Override
     public void run() {
-        System.out.println("new ConnectionHandler thread started .... "); //I don't think this actually starts a new thread
+        System.out.println("new ConnectionHandler thread started .... ");
         try {
             printClientData();
         } catch (Exception e) {

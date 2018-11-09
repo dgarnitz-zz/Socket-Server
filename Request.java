@@ -150,8 +150,8 @@ class Request {
      * methods to analyze the request and formulate responses, which are stored in a string ArrayList. It then sends
      * the response back to the client and logs it in a locally stored file. It should be noted that this method only
      * creates a response header, and that any content requested will actually be send by the GetRequest class.
-     * @param os
-     * @param line
+     * @param os The ServerSocket's OutputStream
+     * @param line String array containing a line from the HTTP request
      */
     static void simpleWriter(OutputStream os, String[] line) {
 
